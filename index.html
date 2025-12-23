@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Modern Tic Tac Toe - Online</title>
     <style>
         /* --- CORE STYLES & VARIABLES --- */
@@ -361,11 +361,22 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         // --- Firebase Init ---
-        const firebaseConfig = JSON.parse(__firebase_config);
+        // Your provided Firebase config has been pasted here:
+        const firebaseConfig = {
+          apiKey: "AIzaSyDfi6lwTYsKAuudHZp7AAmKZ9MuGhiedlE",
+          authDomain: "tg-game-app.firebaseapp.com",
+          databaseURL: "https://tg-game-app-default-rtdb.firebaseio.com",
+          projectId: "tg-game-app",
+          storageBucket: "tg-game-app.firebasestorage.app",
+          messagingSenderId: "710848637600",
+          appId: "1:710848637600:web:8fe31b239245f58ef7f7c5"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // use projectId as appId for room names (so it matches your Firebase project)
+        const appId = firebaseConfig.projectId || 'default-app-id';
 
         // --- Game State Variables ---
         let boardState = ["", "", "", "", "", "", "", "", ""];
@@ -507,6 +518,7 @@
                 players: 1
             };
 
+            // Save room doc - nested path used as in original code (will create subcollections/docs)
             await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', code), roomData);
             setupOnlineListener(code);
 
