@@ -1,538 +1,664 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>MODERN CROSS GAME BY ANSHUHIM</title>
-    <style>
-        :root{
-            --bg: #0a0b10;
-            --card: #151921;
-            --cyan: #00f2ff;
-            --purple: #bc13fe;
-            --main: #e0e6ed;
-            --dim: #94a3b8;
-            --transition: all .22s cubic-bezier(.4,0,.2,1);
-        }
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{
-            font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-            background:linear-gradient(135deg,#0a0b10 0%,#1a1c2c 100%);
-            color:var(--main);
-            min-height:100vh;display:flex;flex-direction:column;align-items:center;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>MODERN CROSS GAME BY ANSHUHIM</title>
+  <meta name="theme-color" content="#0b0d13"/>
+  <style>
+    /* Mobile-first dark UI inspired by provided screenshots */
+    :root{
+      --bg:#0b0d13; --surface:#15171c; --card:#1b1d24;
+      --primary:#1c5bff; --accent:#00f2ff; --muted:#8b94a7;
+      --xcolor:#2ea5ff; --ocolor:#c67eff;
+      --glass: rgba(255,255,255,0.02);
+      --radius:18px; --transition:all .22s cubic-bezier(.4,0,.2,1);
+      --safe-padding: env(safe-area-inset-bottom, 12px);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#0b0d13 0%, #0f1116 100%);color:#e8eef8;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+    .app{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 18px;padding-bottom:calc(20px + var(--safe-padding));gap:14px}
+    header{width:100%;max-width:420px;margin-top:6vh;display:flex;align-items:center;flex-direction:column;gap:12px}
+    .logo{width:82px;height:82px;border-radius:16px;background:linear-gradient(180deg,#1a5bff 0%,#1738ff 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 18px 40px rgba(28,91,255,0.12)}
+    .logo .icon{font-size:34px}
+    h1{font-size:22px;letter-spacing:0.6px;margin:6px 0 0}
+    .subtitle{color:var(--muted);font-size:12px;margin-top:6px}
 
-        header{width:100%;max-width:700px;padding:1rem;display:flex;align-items:center;gap:12px;justify-content:center}
-        .logo{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,var(--cyan),var(--purple));font-weight:800}
-        header h1{font-size:1.05rem;letter-spacing:1px;text-transform:uppercase}
+    main{width:100%;max-width:420px;flex:1;display:flex;flex-direction:column;align-items:center;gap:12px}
 
-        main{width:100%;max-width:720px;padding:1rem;display:flex;flex-direction:column;gap:1rem}
-        .card{background:var(--card);border-radius:18px;padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+    /* splash screen */
+    .splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(180deg,#0b0d13 0%, #0f1116 100%);z-index:400;transition:opacity .25s}
+    .splash.hidden{opacity:0;pointer-events:none}
+    .splash .logo{width:96px;height:96px;border-radius:20px}
+    .splash h2{font-size:20px;margin-top:18px}
 
-        /* Mode & difficulty */
-        .mode-row{display:flex;gap:8px;margin-bottom:12px}
-        .mode-btn{flex:1;padding:8px;border-radius:10px;border:none;background:transparent;color:var(--dim);font-weight:700;cursor:pointer;transition:var(--transition)}
-        .mode-btn.active{background:var(--purple);color:#fff;box-shadow:0 6px 18px rgba(188,19,254,.12)}
-        .difficulty{display:flex;gap:8px;margin-top:10px;align-items:center}
-        .diff-btn{padding:6px 10px;border-radius:10px;border:none;background:transparent;color:var(--dim);cursor:pointer;font-weight:700}
-        .diff-btn.active{background:var(--cyan);color:#031018;box-shadow:0 6px 18px rgba(0,242,255,.08)}
+    /* Mode select */
+    .menu{width:100%;display:flex;flex-direction:column;gap:14px;margin-top:4vh}
+    .big-btn{width:100%;padding:18px;border-radius:32px;background:var(--card);display:flex;align-items:center;gap:12px;justify-content:center;font-weight:800;font-size:16px;border:none;color:var(--muted);cursor:pointer;box-shadow:0 20px 40px rgba(0,0,0,0.35);transition:var(--transition)}
+    .big-btn.primary{background:linear-gradient(90deg,var(--primary),#1646ff); color:#fff; box-shadow:0 22px 40px rgba(28,91,255,0.2)}
+    .big-btn .emoji{font-size:18px;margin-right:8px}
+    .settings-row{display:flex;flex-direction:column;align-items:center;margin-top:8px;gap:8px}
+    .settings-row .small{font-size:14px;color:var(--muted);display:flex;gap:8px;align-items:center}
+    .small button{background:none;border:none;color:var(--muted);cursor:pointer;font-weight:700}
 
-        .status{text-align:center;margin-bottom:8px}
-        .status .text{font-weight:800;font-size:1.05rem;margin-bottom:6px}
-        .indicator{height:4px;width:56px;margin:0 auto;background:var(--cyan);border-radius:3px;box-shadow:0 0 10px var(--cyan);transition:var(--transition)}
-        .turn-o .indicator{background:var(--purple);box-shadow:0 0 10px var(--purple)}
+    /* Difficulty Screen */
+    .page { width:100%;max-width:420px; display:none; flex-direction:column; gap:12px; }
+    .page.show{display:flex}
+    .diff-card{display:flex;align-items:center;gap:12px;padding:16px;border-radius:20px;background:var(--card);border:1px solid var(--glass);cursor:pointer}
+    .diff-card.active{background:linear-gradient(90deg,var(--primary),#1646ff);box-shadow:0 20px 40px rgba(22,68,255,0.14);color:#fff}
+    .diff-card .icon{width:46px;height:46;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02)}
+    .diff-card h3{margin:0;font-size:16px}
+    .diff-card p{margin:0;color:var(--muted);font-size:12px}
 
-        .board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:95%;aspect-ratio:1/1;margin:10px auto;padding:10px;background:rgba(0,242,255,0.03);border-radius:14px;border:1px solid rgba(0,242,255,0.06)}
-        .cell{background:#1a1c2c;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;font-weight:900;cursor:pointer;border:1px solid rgba(255,255,255,.03);user-select:none;min-height:60px;transition:var(--transition)}
-        .cell.x{color:var(--cyan);text-shadow:0 0 12px rgba(0,242,255,.35)}
-        .cell.o{color:var(--purple);text-shadow:0 0 12px rgba(188,19,254,.35)}
-        .cell.winner{background:rgba(255,255,255,0.06);animation:pulse 1s infinite alternate}
+    .start-row{margin-top:10px}
 
-        @keyframes pulse{from{box-shadow:0 0 5px currentColor}to{box-shadow:0 0 20px currentColor}}
+    /* Game screen */
+    .game{display:none;flex-direction:column;gap:12px;width:100%;max-width:420px}
+    .game.show{display:flex}
+    .game .topbar{display:flex;align-items:center;justify-content:space-between;width:100%}
+    .pill{padding:12px 16px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);font-weight:800;display:flex;align-items:center;gap:10px}
+    .pill.turn{align-self:center; margin:0 auto; box-shadow:0 12px 26px rgba(28,91,255,0.08); transition:var(--transition)}
+    .pill.blink{animation:blink 1s infinite}
+    @keyframes blink{0%{transform:translateY(0);box-shadow:0 8px 26px rgba(28,91,255,0.08)}50%{transform:translateY(-6px);box-shadow:0 18px 40px rgba(28,91,255,0.14)}100%{transform:translateY(0)}}
 
-        .controls{display:flex;gap:10px;margin-top:6px}
-        .btn{flex:1;padding:11px;border-radius:12px;border:none;font-weight:800;cursor:pointer}
-        .btn.restart{background:#2d3446;color:#fff}
-        .btn.reset{background:var(--cyan);color:#041019}
+    .board{width:100%;aspect-ratio:1/1;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:14px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent)}
+    .cell{background:rgba(255,255,255,0.02);border-radius:18px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:44px;color:var(--muted);cursor:pointer;user-select:none;transition:transform .12s}
+    .cell:active{transform:scale(.98)}
+    .cell.x{color:var(--xcolor);text-shadow:0 6px 18px rgba(46,165,255,0.08)}
+    .cell.o{color:var(--ocolor);text-shadow:0 6px 18px rgba(198,126,255,0.06)}
+    .cell.winner{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03)); box-shadow:0 20px 40px rgba(46,165,255,0.06)}
 
-        .scores{display:flex;justify-content:space-between;background:var(--card);padding:12px;border-radius:12px;margin-top:12px}
-        .score-item{text-align:center;flex:1}
-        .score-label{font-size:.65rem;color:var(--dim);text-transform:uppercase}
-        .score-val{font-size:1.1rem;font-weight:800}
-        .val-x{color:var(--cyan)}
-        .val-o{color:var(--purple)}
+    .score-row{display:flex;gap:12px;margin-top:6px}
+    .score-box{flex:1;padding:14px;border-radius:22px;background:var(--card);display:flex;flex-direction:column;align-items:center;gap:6px}
+    .score-box.active{box-shadow:inset 0 -8px 0 rgba(28,91,255,0.1)}
+    .score-label{font-size:12px;color:var(--muted)}
+    .score-val{font-size:20px;font-weight:900}
 
-        footer{padding:18px;text-align:center;color:var(--dim);font-size:.8rem}
+    .bottom-btn{width:100%;padding:18px;border-radius:32px;border:none;background:linear-gradient(90deg,var(--primary),#1646ff);color:#fff;font-weight:900;font-size:16px;cursor:pointer;margin-top:8px}
 
-        /* toast & modal */
-        #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:8px 14px;border-radius:18px;display:none;z-index:2000}
-        .modal-back{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center;z-index:2500}
-        .modal-back.show{display:flex}
-        .modal{background:var(--card);padding:18px;border-radius:12px;width:min(460px,92%);text-align:center;border:1px solid rgba(255,255,255,.03)}
-        .modal h2{font-size:1.15rem;margin-bottom:6px}
-        .modal p{color:var(--dim);margin-bottom:12px}
-        .modal .actions{display:flex;gap:8px;justify-content:center}
+    /* Modal result */
+    .modal-back{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center;z-index:600}
+    .modal-back.show{display:flex}
+    .modal{background:var(--surface);padding:18px;border-radius:14px;max-width:92%;width:360px;text-align:center;border:1px solid var(--glass)}
+    .modal .big-icon{font-size:48px;margin-bottom:6px}
+    .modal h3{margin:6px 0}
+    .modal p{color:var(--muted);font-size:13px;margin:6px 0 14px}
+    .modal .actions{display:flex;gap:10px;justify-content:center}
+    .modal button{padding:10px 12px;border-radius:12px;border:none;cursor:pointer;font-weight:800}
 
-        @media(min-width:768px){main{max-width:900px;display:grid;grid-template-columns:1fr 320px;gap:16px}}
-    </style>
+    /* Help & settings */
+    .help-content{font-size:13px;color:var(--muted);line-height:1.4;text-align:left;max-height:60vh;overflow:auto;padding-right:6px}
+
+    footer{width:100%;max-width:420px;text-align:center;color:var(--muted);font-size:12px;padding-bottom:calc(8px + var(--safe-padding))}
+    /* small screens tweak */
+    @media (max-width:360px){
+      .cell{font-size:34px}
+      .logo{width:68px;height:68px}
+    }
+  </style>
 </head>
-<body class="turn-x">
+<body>
+  <div class="splash" id="splash">
+    <div class="logo"><div class="icon">✕⭕</div></div>
+    <h2>TIC TAC TOE</h2>
+    <div class="subtitle">MASTER THE GRID</div>
+  </div>
 
+  <div class="app" id="app">
     <header>
-        <div class="logo">✕⭕</div>
-        <h1>MODERN CROSS GAME BY ANSHUHIM</h1>
+      <div class="logo"><div class="icon">✕⭕</div></div>
+      <h1>MODERN CROSS GAME BY ANSHUHIM</h1>
+      <div class="subtitle">Fast · Mobile · Friendly</div>
     </header>
 
-    <div id="toast" role="status" aria-live="polite">Message</div>
-
     <main>
-        <section class="card">
-            <div style="display:flex;flex-direction:column">
-                <div class="mode-row" role="tablist" aria-label="Game Modes">
-                    <button id="btn-pvp" class="mode-btn active" onclick="setMode('pvp')" aria-pressed="true">Local P vs P</button>
-                    <button id="btn-ai" class="mode-btn" onclick="setMode('ai')" aria-pressed="false">Vs Computer</button>
-                </div>
+      <!-- MAIN MENU -->
+      <section class="menu page show" id="menuPage">
+        <div style="height:6vh"></div>
+        <button class="big-btn primary" id="btnVsCPU"><span class="emoji">🤖</span> VS COMPUTER</button>
+        <button class="big-btn" id="btnPvP"><span class="emoji">👥</span> OFFLINE MULTIPLAYER</button>
 
-                <div id="ai-controls" style="display:none">
-                    <div style="font-size:0.85rem;color:var(--dim);margin-bottom:6px">AI Difficulty</div>
-                    <div class="difficulty" role="group" aria-label="AI Difficulty">
-                        <button class="diff-btn" id="diff-easy" onclick="setAIDifficulty('easy')">Easy</button>
-                        <button class="diff-btn active" id="diff-medium" onclick="setAIDifficulty('medium')">Medium</button>
-                        <button class="diff-btn" id="diff-hard" onclick="setAIDifficulty('hard')">Hard</button>
-                    </div>
-                </div>
+        <div class="settings-row">
+          <div class="small">
+            <button id="btnSettings">⚙ Settings</button> •
+            <button id="btnHelp">❔ Help</button>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">Version 1.0.0</div>
+        </div>
+      </section>
 
-                <div class="status" aria-live="polite">
-                    <div class="text" id="statusText">👤 1️⃣ Player 1 — X's Turn</div>
-                    <div class="indicator"></div>
-                </div>
+      <!-- DIFFICULTY PAGE -->
+      <section class="page" id="diffPage" aria-hidden="true">
+        <div style="height:3vh"></div>
+        <h2 style="text-align:center;margin:0">Select Difficulty</h2>
+        <div style="text-align:center;color:var(--muted);font-size:13px;margin-bottom:8px">Choose your opponent's processing power</div>
 
-                <div class="board" id="board" aria-label="Tic Tac Toe board">
-                    <div class="cell" data-index="0" tabindex="0" role="button" aria-label="cell 0"></div>
-                    <div class="cell" data-index="1" tabindex="0" role="button" aria-label="cell 1"></div>
-                    <div class="cell" data-index="2" tabindex="0" role="button" aria-label="cell 2"></div>
-                    <div class="cell" data-index="3" tabindex="0" role="button" aria-label="cell 3"></div>
-                    <div class="cell" data-index="4" tabindex="0" role="button" aria-label="cell 4"></div>
-                    <div class="cell" data-index="5" tabindex="0" role="button" aria-label="cell 5"></div>
-                    <div class="cell" data-index="6" tabindex="0" role="button" aria-label="cell 6"></div>
-                    <div class="cell" data-index="7" tabindex="0" role="button" aria-label="cell 7"></div>
-                    <div class="cell" data-index="8" tabindex="0" role="button" aria-label="cell 8"></div>
-                </div>
+        <div id="diffList" style="display:flex;flex-direction:column;gap:12px">
+          <div class="diff-card" data-diff="easy" id="diff-easy">
+            <div class="icon">🙂</div>
+            <div style="flex:1"><h3>Easy</h3><p>Perfect for beginners</p></div>
+            <div style="opacity:.6">○</div>
+          </div>
 
-                <div class="controls">
-                    <button class="btn restart" onclick="restartGame()">Restart Round</button>
-                    <button class="btn reset" onclick="newGame()">Reset Scores</button>
-                </div>
-            </div>
-        </section>
+          <div class="diff-card active" data-diff="medium" id="diff-medium">
+            <div class="icon">😐</div>
+            <div style="flex:1"><h3>Medium</h3><p>Balanced challenge</p></div>
+            <div style="opacity:.6">●</div>
+          </div>
 
-        <aside>
-            <div class="card scores">
-                <div class="score-item">
-                    <div class="score-label">Player X</div>
-                    <div class="score-val val-x" id="scoreX">0</div>
-                </div>
-                <div class="score-item">
-                    <div class="score-label">Draws</div>
-                    <div class="score-val" id="scoreDraws">0</div>
-                </div>
-                <div class="score-item">
-                    <div class="score-label">Player O</div>
-                    <div class="score-val val-o" id="scoreO">0</div>
-                </div>
-            </div>
+          <div class="diff-card" data-diff="hard" id="diff-hard">
+            <div class="icon">🤖</div>
+            <div style="flex:1"><h3>Hard</h3><p>Unbeatable AI</p></div>
+            <div style="opacity:.6">○</div>
+          </div>
+        </div>
 
-            <div style="margin-top:12px" class="card">
-                <div style="font-weight:800;margin-bottom:8px">How to play</div>
-                <div style="color:var(--dim);font-size:0.92rem;line-height:1.4">
-                    - X always starts.<br>
-                    - In PvP: Player 1 is X (1️⃣) and Player 2 is O (2️⃣).<br>
-                    - In Vs Computer: you are 👤 (X) and AI is 🤖 (O).<br>
-                    - Choose difficulty: Easy (random), Medium (smart), Hard (unbeatable).
-                </div>
-            </div>
-        </aside>
+        <div class="start-row">
+          <button class="bottom-btn" id="startVsCpu">Start Game ▶</button>
+        </div>
+      </section>
+
+      <!-- GAME PAGE -->
+      <section class="game page" id="gamePage" aria-hidden="true">
+        <div class="topbar">
+          <button id="backToMenu" style="background:none;border:none;color:var(--muted);font-weight:800;cursor:pointer">←</button>
+          <div class="pill turn" id="turnPill">👤 Your Turn — X</div>
+          <div style="width:38px"></div>
+        </div>
+
+        <div class="board" id="board" role="grid" aria-label="Game board">
+          <!-- 9 cells created via JS -->
+        </div>
+
+        <div class="score-row">
+          <div class="score-box" id="boxYou"><div class="score-label" id="labelLeft">YOU</div><div class="score-val" id="scoreLeft">0</div></div>
+          <div class="score-box" id="boxCPU"><div class="score-label" id="labelRight">CPU</div><div class="score-val" id="scoreRight">0</div></div>
+        </div>
+
+        <button class="bottom-btn" id="resetBtn">↻ Reset Game</button>
+      </section>
     </main>
 
-    <footer>
-        <div>Website created by Himanshu – anshuhim.com</div>
-    </footer>
+    <footer>Website by Himanshu — anshuhim.com</footer>
+  </div>
 
-    <!-- Modal -->
-    <div class="modal-back" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
-        <div class="modal" role="document">
-            <h2 id="modalTitle">Game Over</h2>
-            <p id="modalMsg">Result</p>
-            <div class="actions">
-                <button class="btn restart" id="modalRestart">Restart Round</button>
-                <button class="btn reset" id="modalReset">Reset Scores</button>
-                <button class="btn" id="modalClose" style="background:#2d3446;color:#fff">Close</button>
-            </div>
-        </div>
+  <!-- Modals -->
+  <div class="modal-back" id="resultModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="big-icon" id="resultIcon">🏆</div>
+      <h3 id="resultTitle">You Win!</h3>
+      <p id="resultText">Great move — X completed the line.</p>
+      <div class="actions">
+        <button id="modalRestart" style="background:var(--primary);color:#fff;border-radius:12px;padding:10px 12px">Restart</button>
+        <button id="modalMain" style="background:#2b2f37;color:#fff;border-radius:12px;padding:10px 12px">Main Menu</button>
+      </div>
     </div>
+  </div>
 
-    <script>
-    /**********************
-     * Modern Cross Game
-     * - Modes: Local PvP, Vs Computer
-     * - AI difficulty: easy / medium / hard (minimax)
-     * - Emoji-based status lines
-     * - Simple generated sounds (no external files)
-     **********************/
+  <div class="modal-back" id="helpModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3>How to Play</h3>
+      <div class="help-content">
+        <p><strong>Goal:</strong> Get three marks in a row — horizontally, vertically or diagonally.</p>
+        <p><strong>Modes:</strong> <em>VS Computer</em> choose difficulty (Easy/Medium/Hard). <em>Offline Multiplayer</em> two players take turns on same device.</p>
+        <p><strong>Turns:</strong> X always starts. A blue pill shows whose turn it is and blinks while active.</p>
+        <p><strong>Result:</strong> When someone wins or game draws, a popup appears with Restart and Main Menu buttons.</p>
+        <p><strong>Sound:</strong> Tap sounds and background music can be toggled in Settings (in menu).</p>
+        <p>If you'd like further changes (icons, choose who starts, AI goes first etc.) tell me — I can add them.</p>
+      </div>
+      <div class="actions" style="margin-top:8px">
+        <button id="closeHelp" style="background:var(--primary);color:#fff;padding:10px 12px;border-radius:10px">Close</button>
+      </div>
+    </div>
+  </div>
 
-    // State
-    let boardState = Array(9).fill("");
-    let currentPlayer = "X";
-    let gameActive = true;
-    let gameMode = "pvp"; // 'pvp' | 'ai'
-    let aiDifficulty = "medium"; // easy | medium | hard
-    let scores = { X: 0, O: 0, Draws: 0 };
+  <!-- Lightweight settings panel (simple) -->
+  <div class="modal-back" id="settingsModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3>Settings</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+        <label style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:800">Sound Effects</div>
+            <div style="font-size:12px;color:var(--muted)">Toggle tap/win/draw sounds</div>
+          </div>
+          <input type="checkbox" id="toggleSfx"/>
+        </label>
 
-    // DOM
-    const statusText = document.getElementById('statusText');
-    const indicator = document.querySelector('.indicator');
-    const cells = document.querySelectorAll('.cell');
-    const scoreXEl = document.getElementById('scoreX');
-    const scoreOEl = document.getElementById('scoreO');
-    const scoreDrawsEl = document.getElementById('scoreDraws');
-    const toast = document.getElementById('toast');
-    const aiControls = document.getElementById('ai-controls');
+        <label style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:800">Background Music</div>
+            <div style="font-size:12px;color:var(--muted)">Ambient loop music</div>
+          </div>
+          <input type="checkbox" id="toggleMusic"/>
+        </label>
 
-    // Modal
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalMsg = document.getElementById('modalMsg');
-    document.getElementById('modalRestart').addEventListener('click', () => restartGame());
-    document.getElementById('modalReset').addEventListener('click', () => newGame());
-    document.getElementById('modalClose').addEventListener('click', () => hideModal());
-    modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) hideModal(); });
+        <label style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:800">Vibrate on move</div>
+            <div style="font-size:12px;color:var(--muted)">Short vibration on tap (mobile)</div>
+          </div>
+          <input type="checkbox" id="toggleVib"/>
+        </label>
+      </div>
 
-    // Winning patterns
-    const winConditions = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      <div class="actions" style="margin-top:12px">
+        <button id="closeSettings" style="background:var(--primary);color:#fff;padding:10px 12px;border-radius:10px">Close</button>
+      </div>
+    </div>
+  </div>
 
-    // Audio (WebAudio simple beeps) - no files required
-    let audioCtx = null;
-    let audioInitialized = false;
-    function initAudio() {
-        if (audioInitialized) return;
-        try {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            audioInitialized = true;
-        } catch(e) {
-            console.warn("Audio not supported", e);
-            audioInitialized = false;
-        }
+<script>
+/* ======= App logic ======= */
+
+/* --- State --- */
+let currentScreen = 'menu'; // menu, diff, game
+let gameMode = null; // 'ai' | 'pvp'
+let aiDifficulty = 'medium';
+let board = Array(9).fill('');
+let currentPlayer = 'X';
+let gameActive = true;
+let scores = { you: 0, cpu: 0, draws: 0 };
+let sfxEnabled = true, musicEnabled = true, vibrateEnabled = true;
+
+/* --- DOM --- */
+const splash = document.getElementById('splash');
+const menuPage = document.getElementById('menuPage');
+const diffPage = document.getElementById('diffPage');
+const gamePage = document.getElementById('gamePage');
+const boardEl = document.getElementById('board');
+const turnPill = document.getElementById('turnPill');
+const resultModal = document.getElementById('resultModal');
+const resultTitle = document.getElementById('resultTitle');
+const resultText = document.getElementById('resultText');
+const resultIcon = document.getElementById('resultIcon');
+const scoreLeft = document.getElementById('scoreLeft');
+const scoreRight = document.getElementById('scoreRight');
+const boxYou = document.getElementById('boxYou');
+const boxCPU = document.getElementById('boxCPU');
+
+const helpModal = document.getElementById('helpModal');
+const settingsModal = document.getElementById('settingsModal');
+
+/* --- Audio (WebAudio) --- */
+let audioCtx = null;
+let bgGain = null;
+let musicOsc = null;
+let audioReady = false;
+
+function initAudioOnce(){
+  if (audioReady) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // background music simple low oscillator + LFO for movement
+    bgGain = audioCtx.createGain(); bgGain.gain.value = 0.00; bgGain.connect(audioCtx.destination);
+    musicOsc = audioCtx.createOscillator(); musicOsc.type = 'sine'; musicOsc.frequency.value = 110;
+    const lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.12;
+    const lfoGain = audioCtx.createGain(); lfoGain.gain.value = 6;
+    lfo.connect(lfoGain); lfoGain.connect(musicOsc.frequency);
+    musicOsc.connect(bgGain);
+    musicOsc.start(); lfo.start();
+    audioReady = true;
+    if (musicEnabled) { bgGain.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + 0.5); }
+  } catch(e){ console.warn('Audio init failed',e); audioReady = false; }
+}
+
+/* play short tone */
+function playTone(freq=660, dur=0.06, type='sine', vol=0.07){
+  if(!audioReady || !sfxEnabled) return;
+  try{
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.value = vol;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    setTimeout(()=>{ try{o.stop();}catch(e){} }, dur*1000+30);
+  }catch(e){}
+}
+function playMoveSound(){ playTone(820,0.05,'sine',0.06) }
+function playWinSound(){ playTone(520,0.18,'sawtooth',0.16); setTimeout(()=>playTone(880,0.12,'triangle',0.12),150) }
+function playDrawSound(){ playTone(300,0.18,'sine',0.08); setTimeout(()=>playTone(420,0.12,'sine',0.07),120) }
+
+/* --- Persistence --- */
+function loadPrefs(){
+  try{
+    const p = JSON.parse(localStorage.getItem('mcg_prefs') || '{}');
+    if(p.sfxEnabled !== undefined) sfxEnabled = p.sfxEnabled;
+    if(p.musicEnabled !== undefined) musicEnabled = p.musicEnabled;
+    if(p.vibrateEnabled !== undefined) vibrateEnabled = p.vibrateEnabled;
+    const sc = JSON.parse(localStorage.getItem('mcg_scores') || '{}');
+    if(sc.you !== undefined) scores = sc;
+  }catch(e){}
+  updateSettingsUI();
+  updateScoreUI();
+}
+function savePrefs(){
+  localStorage.setItem('mcg_prefs', JSON.stringify({ sfxEnabled, musicEnabled, vibrateEnabled }));
+  localStorage.setItem('mcg_scores', JSON.stringify(scores));
+}
+
+/* --- UI helpers --- */
+function showPage(name){
+  currentScreen = name;
+  menuPage.classList.toggle('show', name === 'menu');
+  diffPage.classList.toggle('show', name === 'diff');
+  gamePage.classList.toggle('show', name === 'game');
+}
+function showModal(modal){
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden','false');
+  modal.style.display = 'flex';
+}
+function hideModal(modal){
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden','true');
+  modal.style.display = 'none';
+}
+
+/* --- Build board cells --- */
+function buildBoard(){
+  boardEl.innerHTML = '';
+  for(let i=0;i<9;i++){
+    const c = document.createElement('div');
+    c.className = 'cell';
+    c.setAttribute('data-index', i);
+    c.setAttribute('role','button');
+    c.setAttribute('tabindex','0');
+    c.addEventListener('click', ()=> onCellClick(i));
+    c.addEventListener('keydown', (e)=> { if(e.key==='Enter'||e.key===' ') onCellClick(i); });
+    boardEl.appendChild(c);
+  }
+}
+
+/* --- Game logic --- */
+function startGame(mode, difficulty='medium'){
+  gameMode = mode;
+  aiDifficulty = difficulty;
+  board = Array(9).fill('');
+  currentPlayer = 'X';
+  gameActive = true;
+  buildBoard();
+  updateUI();
+  showPage('game');
+  // initialize audio when user first interacts:
+  initAudioOnce();
+  if (musicEnabled && audioReady) bgGain.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + 0.5);
+}
+function updateUI(){
+  // update turn pill (emoji labels)
+  if(gameMode === 'pvp'){
+    turnPill.innerText = currentPlayer === 'X' ? '👤 1️⃣ Player 1 — X' : '👤 2️⃣ Player 2 — O';
+  } else {
+    turnPill.innerText = currentPlayer === 'X' ? '👤 Your Turn — X' : '🤖 AI\'s Turn — O';
+  }
+  // blink effect only when waiting for physical user or AI?
+  if(gameActive) {
+    turnPill.classList.add('blink');
+  } else {
+    turnPill.classList.remove('blink');
+  }
+  // update board DOM
+  const cells = boardEl.querySelectorAll('.cell');
+  cells.forEach((el,i)=>{
+    el.innerText = board[i];
+    el.classList.remove('x','o','winner');
+    if(board[i] === 'X') el.classList.add('x');
+    if(board[i] === 'O') el.classList.add('o');
+  });
+  // update scores blocks
+  updateScoreUI();
+}
+function updateScoreUI(){
+  scoreLeft.innerText = scores.you;
+  scoreRight.innerText = scores.cpu;
+  // set active styling depending on who leads slightly (optional)
+  boxYou.classList.toggle('active', scores.you >= scores.cpu);
+}
+
+function onCellClick(i){
+  if(!gameActive) return;
+  if(board[i] !== '') return;
+  // In AI mode, human plays as X
+  if(gameMode === 'ai' && currentPlayer !== 'X'){
+    return;
+  }
+  // vibration
+  if (vibrateEnabled && navigator.vibrate) navigator.vibrate(20);
+  // audio
+  initAudioOnce(); playMoveSound();
+
+  board[i] = currentPlayer;
+  // check result
+  if(checkEnd()){
+    updateUI();
+    return;
+  }
+  // toggle
+  currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  updateUI();
+
+  // if AI turn and in ai mode -> make AI move after small delay
+  if(gameMode === 'ai' && currentPlayer === 'O' && gameActive){
+    setTimeout(()=> aiMakeMove(), 420);
+  }
+}
+
+function checkEnd(){
+  // check win
+  for(const cond of [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]){
+    const [a,b,c] = cond;
+    if(board[a] && board[a] === board[b] && board[a] === board[c]){
+      // winner is board[a]
+      gameActive = false;
+      // highlight
+      const cells = boardEl.querySelectorAll('.cell');
+      [a,b,c].forEach(idx => cells[idx].classList.add('winner'));
+      // update scores: for AI mode, 'you' refers to player X
+      if(gameMode === 'ai'){
+        if(board[a] === 'X') { scores.you++; showResult('You Win!', '🏆', `X completed a line.`); playWinSound(); }
+        else { scores.cpu++; showResult('You Lose!', '🤖', `O completed a line.`); playWinSound(); }
+      } else {
+        // PvP: show which symbol won
+        showResult(`${board[a]} Wins!`, board[a] === 'X' ? '🎉' : '🎉', `${board[a]} completed a line.`);
+        playWinSound();
+      }
+      savePrefs();
+      return true;
     }
-    // resume audio on first interaction (some browsers require)
-    window.addEventListener('pointerdown', initAudio, {once:true});
+  }
+  // draw
+  if(!board.includes('')){
+    gameActive = false;
+    if(gameMode === 'ai') scores.draws = (scores.draws||0)+1;
+    showResult("It's a Draw", '🤝', "Nobody could get three in a row.");
+    playDrawSound();
+    savePrefs();
+    return true;
+  }
+  return false;
+}
 
-    function playTone(freq=440, time=0.06, type='sine', gain=0.12) {
-        if (!audioInitialized) return;
-        const o = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        o.type = type;
-        o.frequency.value = freq;
-        g.gain.value = gain;
-        o.connect(g);
-        g.connect(audioCtx.destination);
-        o.start();
-        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + time);
-        setTimeout(()=>{ try{ o.stop(); }catch(e){} }, time*1000 + 20);
+/* --- AI logic --- */
+function aiMakeMove(){
+  if(!gameActive) return;
+  let idx = null;
+  if(aiDifficulty === 'easy'){
+    // random
+    const avail = board.map((v,i)=>v===''?i:null).filter(x=>x!==null);
+    idx = avail[Math.floor(Math.random()*avail.length)];
+  } else if(aiDifficulty === 'medium'){
+    // heuristic: try win, block, center, corner, random — with small chance to pick random
+    if(Math.random() < 0.22){ // make occasional mistake
+      const avail = board.map((v,i)=>v===''?i:null).filter(x=>x!==null);
+      idx = avail[Math.floor(Math.random()*avail.length)];
+    } else {
+      idx = findWinningMove('O') ?? findWinningMove('X') ?? (board[4]===''?4:null) ?? pickCorner() ?? pickAny();
     }
-    function playMoveSound(){ playTone(880,0.06,'sine',0.08) }
-    function playWinSound(){ playTone(520,0.18,'sawtooth',0.16); setTimeout(()=>playTone(780,0.14,'triangle',0.12),150) }
-    function playDrawSound(){ playTone(300,0.16,'sine',0.11); setTimeout(()=>playTone(450,0.12,'sine',0.09),140) }
+  } else {
+    // hard: minimax
+    idx = minimaxRoot(board.slice(), 'O');
+  }
+  if(idx == null) return;
+  board[idx] = 'O';
+  initAudioOnce(); playMoveSound();
+  if(checkEnd()) { updateUI(); return; }
+  currentPlayer = 'X';
+  updateUI();
+}
 
-    // Helpers
-    function showToast(msg, ms=1500){
-        toast.innerText = msg;
-        toast.style.display = 'block';
-        clearTimeout(toast._t);
-        toast._t = setTimeout(()=> toast.style.display='none', ms);
+/* helpers for AI */
+function pickCorner(){
+  const corners=[0,2,6,8].filter(i=>board[i]==='');
+  if(corners.length) return corners[Math.floor(Math.random()*corners.length)];
+  return null;
+}
+function pickAny(){ for(let i=0;i<9;i++) if(board[i]==='') return i; return null; }
+function findWinningMove(p){
+  for(const cond of [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]){
+    const [a,b,c] = cond;
+    const vals=[board[a],board[b],board[c]];
+    if(vals.filter(v=>v===p).length===2 && vals.filter(v=>v==='').length===1){
+      const emptyIndex = [a,b,c][vals.indexOf('')];
+      return emptyIndex;
     }
+  }
+  return null;
+}
 
-    // Initial render
-    updateScoreboard();
-    updateBoardUI();
-    updateStatusUI();
+/* Minimax for hard */
+function minimaxRoot(bd, player){
+  let bestVal = -Infinity, move = null;
+  const avail = bd.map((v,i)=> v===''?i:null).filter(x=>x!==null);
+  for(const i of avail){
+    bd[i] = player;
+    const val = minimax(bd, false);
+    bd[i] = '';
+    if(val > bestVal){ bestVal = val; move = i; }
+  }
+  return move;
+}
+function minimax(bd, isMax){
+  const winner = checkWinnerForMinimax(bd);
+  if(winner !== null){
+    if(winner === 'O') return 10;
+    if(winner === 'X') return -10;
+    if(winner === 'draw') return 0;
+  }
+  if(isMax){
+    let best = -Infinity;
+    for(let i=0;i<9;i++){ if(bd[i]===''){ bd[i]='O'; const val=minimax(bd,false); bd[i]=''; best = Math.max(best,val); } }
+    return best;
+  } else {
+    let best = Infinity;
+    for(let i=0;i<9;i++){ if(bd[i]===''){ bd[i]='X'; const val=minimax(bd,true); bd[i]=''; best = Math.min(best,val); } }
+    return best;
+  }
+}
+function checkWinnerForMinimax(bd){
+  for(const cond of [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]){
+    const [a,b,c] = cond;
+    if(bd[a] && bd[a] === bd[b] && bd[a] === bd[c]) return bd[a];
+  }
+  if(!bd.includes('')) return 'draw';
+  return null;
+}
 
-    // Events on cells (click + keyboard)
-    cells.forEach(cell => {
-        cell.addEventListener('click', () => handleCellClick(cell));
-        cell.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCellClick(cell); }
-        });
-    });
+/* --- Results handling --- */
+function showResult(title, iconEmoji, text){
+  resultTitle.innerText = title;
+  resultIcon.innerText = iconEmoji;
+  resultText.innerText = text;
+  showModal(resultModal);
+}
 
-    // Mode & difficulty controls
-    window.setMode = (mode) => {
-        if (mode !== 'pvp' && mode !== 'ai') return;
-        gameMode = mode;
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-' + mode).classList.add('active');
-        aiControls.style.display = (mode === 'ai') ? 'block' : 'none';
-        restartGame();
-        showToast(mode === 'ai' ? 'Mode: Vs Computer' : 'Mode: Local PvP');
-    };
+/* --- Controls: menu buttons --- */
+document.getElementById('btnVsCPU').addEventListener('click', ()=>{
+  showPage('diff');
+});
+document.getElementById('btnPvP').addEventListener('click', ()=>{
+  startGame('pvp');
+});
+document.getElementById('backToMenu').addEventListener('click', ()=>{
+  showPage('menu');
+  hideModal(resultModal);
+});
+document.getElementById('startVsCpu').addEventListener('click', ()=>{
+  startGame('ai', aiDifficulty);
+});
+document.getElementById('diff-easy').addEventListener('click', ()=> setDiff('easy'));
+document.getElementById('diff-medium').addEventListener('click', ()=> setDiff('medium'));
+document.getElementById('diff-hard').addEventListener('click', ()=> setDiff('hard'));
 
-    window.setAIDifficulty = (d) => {
-        if (!['easy','medium','hard'].includes(d)) return;
-        aiDifficulty = d;
-        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('diff-' + d).classList.add('active');
-        showToast('AI: ' + d[0].toUpperCase() + d.slice(1));
-    };
+function setDiff(d){
+  aiDifficulty = d;
+  document.querySelectorAll('.diff-card').forEach(el=>el.classList.remove('active'));
+  document.getElementById('diff-'+d).classList.add('active');
+}
 
-    // Click handler
-    function handleCellClick(cell){
-        if (!gameActive) return;
-        const idx = Number(cell.getAttribute('data-index'));
-        if (boardState[idx] !== "") return;
+/* modal actions */
+document.getElementById('modalRestart').addEventListener('click', ()=>{
+  hideModal(resultModal);
+  startGame(gameMode, aiDifficulty);
+});
+document.getElementById('modalMain').addEventListener('click', ()=>{
+  hideModal(resultModal);
+  showPage('menu');
+});
 
-        // In AI mode, only allow human when it's X's turn (we assume human is X)
-        if (gameMode === 'ai' && currentPlayer !== 'X') {
-            showToast("Wait for the AI 🤖");
-            return;
-        }
+/* help/settings */
+document.getElementById('btnHelp').addEventListener('click', ()=>{
+  showModal(helpModal);
+});
+document.getElementById('closeHelp').addEventListener('click', ()=> hideModal(helpModal));
+document.getElementById('btnSettings').addEventListener('click', ()=> showModal(settingsModal));
+document.getElementById('closeSettings').addEventListener('click', ()=> { hideModal(settingsModal); savePrefs(); });
 
-        // Initialize audio context on user interaction if needed
-        initAudio();
+document.getElementById('resetBtn').addEventListener('click', ()=> {
+  scores = { you:0, cpu:0, draws:0 }; savePrefs(); updateScoreUI(); startGame(gameMode || 'pvp', aiDifficulty);
+});
 
-        makeMove(idx, true); // true => human triggered
-        playMoveSound();
+/* settings toggles */
+const toggleSfx = document.getElementById('toggleSfx');
+const toggleMusic = document.getElementById('toggleMusic');
+const toggleVib = document.getElementById('toggleVib');
 
-        // If AI mode and game still active and it's now AI's turn, trigger AI
-        if (gameMode === 'ai' && gameActive && currentPlayer === 'O') {
-            // small delay to feel natural
-            setTimeout(() => {
-                makeAIMove();
-            }, 380);
-        }
-    }
+function updateSettingsUI(){
+  toggleSfx.checked = sfxEnabled;
+  toggleMusic.checked = musicEnabled;
+  toggleVib.checked = vibrateEnabled;
+}
+toggleSfx.addEventListener('change', ()=> { sfxEnabled = toggleSfx.checked; savePrefs(); });
+toggleMusic.addEventListener('change', ()=> {
+  musicEnabled = toggleMusic.checked;
+  if(audioReady && bgGain) {
+    bgGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    bgGain.gain.linearRampToValueAtTime(musicEnabled ? 0.03 : 0, audioCtx.currentTime + 0.4);
+  }
+  savePrefs();
+});
+toggleVib.addEventListener('change', ()=> { vibrateEnabled = toggleVib.checked; savePrefs(); });
 
-    // Make a move by currentPlayer at index
-    // humanTriggered used to differentiate sounds or analytics if needed
-    function makeMove(index, humanTriggered=false){
-        boardState[index] = currentPlayer;
-        updateBoardUI();
-        // check results before toggling currentPlayer
-        const ended = checkResultAndHandle();
-        if (!ended) {
-            // toggle player
-            currentPlayer = (currentPlayer === 'X') ? 'O' : 'X';
-            updateStatusUI();
-        }
-    }
+/* init: load prefs, scores and do splash */
+loadPrefs();
+buildBoard();
+updateUI();
 
-    // Update board visuals
-    function updateBoardUI(){
-        cells.forEach((c,i) => {
-            c.innerText = boardState[i];
-            c.className = 'cell ' + (boardState[i] ? boardState[i].toLowerCase() : '');
-            if (!boardState[i]) c.classList.remove('winner');
-        });
-    }
+// Splash hide after 1.5s (1-2s as requested)
+setTimeout(()=> {
+  splash.classList.add('hidden');
+  setTimeout(()=> splash.style.display='none', 220);
+}, 1500);
 
-    // Update status text + body class for indicator
-    function updateStatusUI(){
-        document.body.className = `turn-${currentPlayer.toLowerCase()}`;
-        // Build emoji based status
-        if (gameMode === 'pvp') {
-            if (currentPlayer === 'X') {
-                statusText.innerText = "👤 1️⃣ Player 1 — X's Turn";
-            } else {
-                statusText.innerText = "👤 2️⃣ Player 2 — O's Turn";
-            }
-        } else { // ai
-            if (currentPlayer === 'X') {
-                statusText.innerText = "👤 Your Turn — X";
-            } else {
-                statusText.innerText = "🤖 AI's Turn — O";
-            }
-        }
-    }
+/* ensure audio activated on first touch (mobile autoplay policy) */
+window.addEventListener('pointerdown', ()=> {
+  initAudioOnce();
+}, { once:true });
 
-    // Check win/draw and handle end of game. Returns true if game ended.
-    function checkResultAndHandle(){
-        // Win check
-        for (let cond of winConditions){
-            const [a,b,c] = cond;
-            if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
-                // winner is currentPlayer (the one who just played)
-                highlightLine(cond);
-                scores[currentPlayer]++;
-                updateScoreboard();
-                gameActive = false;
-                updateStatusOnEnd(`${currentPlayer} Wins!`);
-                playWinSound();
-                showGameOverModal(`${currentPlayer} Wins!`);
-                return true;
-            }
-        }
-        // Draw
-        if (!boardState.includes("")) {
-            scores.Draws++;
-            updateScoreboard();
-            gameActive = false;
-            updateStatusOnEnd("It's a Draw!");
-            playDrawSound();
-            showGameOverModal("It's a Draw!");
-            return true;
-        }
-        return false;
-    }
+/* save prefs on unload */
+window.addEventListener('beforeunload', ()=> savePrefs());
 
-    function highlightLine(line){
-        line.forEach(i => {
-            const el = document.querySelector(`.cell[data-index="${i}"]`);
-            if (el) el.classList.add('winner');
-        });
-    }
-
-    function updateStatusOnEnd(message){
-        // show message on top + keep body class as winner side (optional)
-        statusText.innerText = message;
-    }
-
-    function updateScoreboard(){
-        scoreXEl.innerText = scores.X;
-        scoreOEl.innerText = scores.O;
-        scoreDrawsEl.innerText = scores.Draws;
-    }
-
-    // Controls
-    function restartGame(){
-        boardState = Array(9).fill("");
-        currentPlayer = "X";
-        gameActive = true;
-        updateBoardUI();
-        updateStatusUI();
-        hideModal();
-        showToast("Round restarted");
-    }
-    function newGame(){
-        scores = { X:0, O:0, Draws:0 };
-        updateScoreboard();
-        restartGame();
-        showToast("Scores reset");
-    }
-    window.restartGame = restartGame;
-    window.newGame = newGame;
-
-    // AI logic
-    function makeAIMove(){
-        if (!gameActive) return;
-        // pick based on difficulty
-        let idx = null;
-        if (aiDifficulty === 'easy') {
-            const avail = boardState.map((v,i)=> v===""?i:null).filter(v=>v!==null);
-            idx = avail[Math.floor(Math.random()*avail.length)];
-        } else if (aiDifficulty === 'medium') {
-            // heuristic: win, block, center, corner, side
-            idx = getWinCheck('O'); if (idx !== null) { /* win */ }
-            else { idx = getWinCheck('X'); } // block
-            if (idx === null) {
-                if (boardState[4]==="") idx = 4;
-            }
-            if (idx === null) {
-                const corners = [0,2,6,8].filter(i=>boardState[i]==="");
-                if (corners.length) idx = corners[Math.floor(Math.random()*corners.length)];
-            }
-            if (idx === null) {
-                for (let i=0;i<9;i++) if (boardState[i]==="") { idx = i; break; }
-            }
-        } else { // hard -> minimax (unbeatable)
-            idx = minimaxRoot(boardState.slice(), 'O');
-        }
-        if (idx == null) return;
-        makeMove(idx, false);
-        playMoveSound();
-    }
-
-    function getWinCheck(p) {
-        for (let c of winConditions) {
-            const vals = [boardState[c[0]], boardState[c[1]], boardState[c[2]]];
-            if (vals.filter(v => v === p).length === 2 && vals.filter(v => v === "").length === 1) {
-                return c[vals.indexOf("")];
-            }
-        }
-        return null;
-    }
-
-    // Minimax helper (for 'O' = AI maximize)
-    function minimaxRoot(board, player) {
-        let bestVal = -Infinity;
-        let bestMove = null;
-        const avail = board.map((v,i)=> v===""?i:null).filter(v=>v!==null);
-        for (let i of avail){
-            board[i] = player;
-            let val = minimax(board, false);
-            board[i] = "";
-            if (val > bestVal) { bestVal = val; bestMove = i; }
-        }
-        return bestMove;
-    }
-    function minimax(board, isMaximizing) {
-        // check terminal
-        const winner = checkWinnerForMinimax(board);
-        if (winner !== null) {
-            if (winner === 'O') return 10;
-            if (winner === 'X') return -10;
-            if (winner === 'draw') return 0;
-        }
-
-        if (isMaximizing) {
-            let best = -Infinity;
-            for (let i=0;i<9;i++){
-                if (board[i] === "") {
-                    board[i] = 'O';
-                    const val = minimax(board, false);
-                    board[i] = "";
-                    best = Math.max(best, val);
-                }
-            }
-            return best;
-        } else {
-            let best = Infinity;
-            for (let i=0;i<9;i++){
-                if (board[i] === "") {
-                    board[i] = 'X';
-                    const val = minimax(board, true);
-                    board[i] = "";
-                    best = Math.min(best, val);
-                }
-            }
-            return best;
-        }
-    }
-    function checkWinnerForMinimax(b) {
-        for (let c of winConditions){
-            const [a,b1,c1] = c;
-            if (b[a] && b[a] === b[b1] && b[a] === b[c1]) return b[a];
-        }
-        if (!b.includes("")) return 'draw';
-        return null;
-    }
-
-    // Game over modal
-    function showGameOverModal(message){
-        modalTitle.innerText = "Game Over";
-        modalMsg.innerText = message;
-        modalBackdrop.classList.add('show');
-        modalBackdrop.setAttribute('aria-hidden','false');
-    }
-    function hideModal(){
-        modalBackdrop.classList.remove('show');
-        modalBackdrop.setAttribute('aria-hidden','true');
-    }
-
-    // Make sure status updates on load
-    document.addEventListener('DOMContentLoaded', () => {
-        updateStatusUI();
-    });
-
-    // expose some for console debugging (optional)
-    window.gameState = () => ({ boardState, currentPlayer, gameActive, scores, gameMode, aiDifficulty });
-    </script>
+</script>
 </body>
 </html>
